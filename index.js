@@ -20,27 +20,15 @@ const accessToken = "cfbfd3e45cb1b35077f41756b8a6f448";
 const app = express();
 app.use(bodyParser.json());
 
-// const init = async () => {
-// 	const res = await requestLockStatus(date, clientId, accessToken);
-// 	console.log(res);
-// };
+const init = async () => {
+	const res = await findByTgId;
+	console.log(res);
+};
 
-// app.post(URI, async (req, res) => {
-// 	console.log(req.body);
-
-// 	const chatId = req.body.message.chat.id;
-// 	const text = req.body.message.text;
-
-// 	await axios.post(`${TELEGRAM_API}/sendMessage`, {
-// 		chat_id: chatId,
-// 		text: text,
-// 	});
-// 	return res.send();
-// });
 
 app.listen(process.env.PORT || 8443, async () => {
 	console.log("app running on port-", process.env.PORT || 8443);
-	// await init();
+	await init();
 });
 
 const bot = new Telegraf(process.env.USERBOT_TOKEN);
