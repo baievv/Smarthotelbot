@@ -10,34 +10,36 @@ Airtable.configure({
 const base = new Airtable({ key }).base("appzPQJSwnY2cv4zc");
 
 async function findByTgId() {
-	const records = [];
+	const pageRecords = [];
 
-	await base("Users")
-		.select()
+	base("Users")
+		.select({
+			maxRecords: 50,
+			view: "Grid view",
+		})
 		.eachPage(
-			function page(pageRecords, fetchNextPage) {
-				pageRecords.forEach(function (record) {
-					// console.log(record.fields);
-					records.push(...record.fields);
+			function page(records, fetchNextPage) {
+				records.forEach(function (record) {
+					console.log("Record:", record.fields);
 				});
 				fetchNextPage();
 			},
 			function done(err) {
 				if (err) {
 					console.error(err);
+					return;
 				}
 			}
 		);
-	return records;
+	return pageRecords;
 }
 
 findByTgId()
 	.then((records) => {
-		console.log(records);
+		console.log("Promise result:", records);
 	})
 	.catch((error) => {
 		console.error("Ошибка при получении записей:", error);
 	});
-
 
 //  module.exports={findByTgId};
