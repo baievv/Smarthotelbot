@@ -10,8 +10,7 @@ Airtable.configure({
 const base = new Airtable({ key }).base("appzPQJSwnY2cv4zc");
 
 async function findByTgId() {
-	const pageRecords = [];
-
+	
 	base("Users")
 		.select({
 			maxRecords: 50,
@@ -21,6 +20,7 @@ async function findByTgId() {
 			function page(records, fetchNextPage) {
 				records.forEach(function (record) {
 					console.log("Record:", record.fields);
+					
 				});
 				fetchNextPage();
 			},
@@ -31,15 +31,7 @@ async function findByTgId() {
 				}
 			}
 		);
-	return pageRecords;
-}
 
-findByTgId()
-	.then((records) => {
-		console.log("Promise result:", records);
-	})
-	.catch((error) => {
-		console.error("Ошибка при получении записей:", error);
-	});
+	}
 
-//  module.exports={findByTgId};
+findByTgId();
