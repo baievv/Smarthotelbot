@@ -1,21 +1,56 @@
 // Записываем в файл index.js
 require("dotenv").config();
+const {
+	requestLockStatus,
+	openLock,
+	closeLock,
+} = require("./iot-connect/lock-server");
 const { Telegraf } = require("telegraf");
-const webAppUrl = "https://singular-griffin-2b9bc4.netlify.app/form";
+const webAppUrl = "https://smart-hotel.netlify.app/dashboard/1";
 const hotelUsers = require("./database/constants");
+const express = require("express");
+const bodyParser = require("body-parser");
+const axios = require("axios");
+const { findByTgId } = require("./db_utils/dbconnect");
+const date = Date.now();
+const clientId = "329721a18c01487ebe8c4f6ed920c4db";
+const lockId = "9166406";
+const accessToken = "cfbfd3e45cb1b35077f41756b8a6f448";
+
+const app = express();
+app.use(bodyParser.json());
+
+// const init = async () => {
+// 	const res = await requestLockStatus(date, clientId, accessToken);
+// 	console.log(res);
+// };
+
+// app.post(URI, async (req, res) => {
+// 	console.log(req.body);
+
+// 	const chatId = req.body.message.chat.id;
+// 	const text = req.body.message.text;
+
+// 	await axios.post(`${TELEGRAM_API}/sendMessage`, {
+// 		chat_id: chatId,
+// 		text: text,
+// 	});
+// 	return res.send();
+// });
+
+app.listen(process.env.PORT || 8443, async () => {
+	console.log("app running on port-", process.env.PORT || 8443);
+	// await init();
+});
 
 const bot = new Telegraf(process.env.USERBOT_TOKEN);
-// const bot = new Telegraf("6286289860:AAHX2Kr5P9gF8G5r0R1Ft0KFC8XAvyQ6hIc");
 
-const isRole = (id) => {
-	return hotelUsers.find((el) => el.id === id);
-};
-
+// bot.session();
 bot.start(async (ctx) => {
 	//проверка пользователя на права
-	//если не админ/стафф, то проверка есть ли пользователь уже в базе гостей и нет ли у него
-	//статуса активного пребывания в апартаментах
+	const userId = ctx.message.from.id;
 	console.log(ctx.message.from.id);
+	console.log(findByTgId(userId))
 	// const userId = ctx.message.from.id;
 	// console.log(isRole(userId).role);
 	try {
@@ -44,7 +79,6 @@ bot.command("drop", async (ctx) => {
 			remove_keyboard: true,
 		},
 	});
-	ctx.setChatMenuButton(menuButton, {});
 });
 
 bot.on("message", async (ctx) => {
@@ -65,4 +99,3 @@ bot.on("message", async (ctx) => {
 });
 
 bot.launch();
-//https://api.telegram.org/bot6286289860:AAHX2Kr5P9gF8G5r0R1Ft0KFC8XAvyQ6hIc/setWebHook?url=https://9jsrhtluhh.execute-api.eu-north-1.amazonaws.com/s1
