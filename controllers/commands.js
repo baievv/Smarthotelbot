@@ -1,20 +1,12 @@
 const { findRoleByTgId } = require("../db_utils/db_utils");
 
 const start = async (ctx) => {
-
-		// await ctx.reply("Menu closed", {
-		// 	reply_markup: {
-		// 		remove_keyboard: true,
-		// 	},
-		// });
-
 	const userId = ctx.message.from.id;
-	console.log(ctx.message);
 	const userRole = await findRoleByTgId(userId);
 
 	switch (userRole) {
 		case "admin":
-			simpleReply(ctx, `Hi, ${userRole}!`);
+			await ctx.reply(`Привет, ${userRole}!`);
 			break;
 		case "guest":
 			() => {};
@@ -23,8 +15,13 @@ const start = async (ctx) => {
 			() => {};
 			break;
 		default:
-      ctx.reply("Приветствуем в Yarocka Smart Hotel");
-			ctx.scene.enter("sceneWizard");
+			await ctx.reply("Добро пожаловать в Yarocka Smart Hotel", {
+				reply_markup: {
+					remove_keyboard: true,
+				},
+			});
+			console.log(ctx.message.chat.id);
+			await ctx.scene.enter("sceneWizard");
 	}
 };
 
