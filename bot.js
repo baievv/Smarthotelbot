@@ -1,13 +1,14 @@
-require("dotenv").config();
-const { start } = require("./controllers/commands");
-const { Telegraf, Composer, Scenes, session, Markup } = require("telegraf");
-// const { simpleReply, isTruePhone } = require("./utils/utils");
-// const { isActualBookingByPhone } = require("./db_utils/db_utils");
-const { firstTimeScene, reAskPhoto, checkPhoto } = require("./controllers/new_guest");
+import { config } from "dotenv";
+config();
+import { start } from "./controllers/commands.js";
+import { Telegraf, Composer, Scenes, session } from "telegraf";
+import { firstTimeScene, reAskPhoto, checkPhoto } from "./controllers/new_guest.js";
 const webAppUrl = "https://smart-hotel.netlify.app/dashboard/1";
+// import fs from "fs";
+// import got from "got";
 const bot = new Telegraf(process.env.USERBOT_TOKEN);
 
-const stage = new Scenes.Stage([firstTimeScene,reAskPhoto,checkPhoto]);
+const stage = new Scenes.Stage([firstTimeScene, reAskPhoto, checkPhoto]);
 
 const setupBot = () => {
 	bot.use((ctx, next) => {
@@ -19,4 +20,4 @@ const setupBot = () => {
 	return bot;
 };
 
-module.exports = { setupBot };
+export { setupBot };

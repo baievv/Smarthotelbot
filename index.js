@@ -1,23 +1,15 @@
 // Записываем в файл index.js
-require("dotenv").config();
+import { config } from "dotenv";
+config();
 // const { Telegraf, Composer, Scenes, session, Markup } = require("telegraf");
 
-const express = require("express");
-const bodyParser = require("body-parser");
-
-const { setupBot } = require("./bot");
+import express from "express";
+// const bodyParser = require("body-parser");
+import bodyParser from "body-parser";
+import {setupBot}  from "./bot.js";
 
 const app = express();
 app.use(bodyParser.json());
-
-
-// bot.command("drop", async (ctx) => {
-// 	await ctx.reply("Menu closed", {
-// 		reply_markup: {
-// 			remove_keyboard: true,
-// 		},
-// 	});
-// });
 
 const init=async ()=> {
 	try {
@@ -32,10 +24,11 @@ app.listen(process.env.PORT || 8443, async () => {
 	console.log("app running on port-", process.env.PORT || 8443);
 	init();
 });
-// bot.on("message", async (ctx) => {
-// 	if (ctx.message?.text) {
-// 		await ctx.reply(ctx.message.text);
-// 	}
+
+
+
+
+
 
 // 	if (ctx?.message.web_app_data?.data) {
 // 		try {

@@ -1,16 +1,30 @@
-const { getFields } = require("./dbconnect");
+import { getFields } from "./dbconnect.js";
 
 const findRoleByTgId = async (id) => {
 	const records = await getFields("Users");
+	// console.log(records);
 	let role = "nobody";
 	for (const item of records) {
 		if (item.tg_id == id) {
 			role = item.role;
 			break; // Досрочный выход из цикла при условии
 		}
-		console.log(item);
 	}
 	return role;
+};
+
+
+
+const getUserRecordIdbyPhone = async (phone) => {
+	const records = await getFields("Users");
+	let id = 0;
+	for (const item of records) {
+		if (item.Phone === phone) {
+			id = item.recId;
+			break; // Досрочный выход из цикла при условии
+		}
+	}
+	return id;
 };
 
 const isActualBookingByPhone = async (phone) => {
@@ -19,14 +33,17 @@ const isActualBookingByPhone = async (phone) => {
 	const records = await getFields("Bookings");
 	for (const item of records) {
 		let guestDate = Date.parse(item.CheckIn);
-		console.log(`Guest phone -${item.Phone}, phone - ${phone}`);
-		console.log(`Guest Date -${guestDate}, now - ${date}`);
+		// console.log(`Guest phone -${item.Phone}, phone - ${phone}`);
+		// console.log(`Guest Date -${guestDate}, now - ${date}`);
 		if (item.Phone == phone && guestDate > date) {
 			result = true;
 		}
 	}
-	console.log(result);
 	return result;
 };
 
-module.exports = { findRoleByTgId, isActualBookingByPhone };
+export  {
+	findRoleByTgId,
+	isActualBookingByPhone,
+	getUserRecordIdbyPhone,
+};

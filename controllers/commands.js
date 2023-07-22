@@ -1,6 +1,6 @@
-const { findRoleByTgId } = require("../db_utils/db_utils");
+import { findRoleByTgId } from "../db_utils/db_utils.js";
 
-const start = async (ctx) => {
+ const start = async (ctx) => {
 	const userId = ctx.message.from.id;
 	const userRole = await findRoleByTgId(userId);
 
@@ -20,9 +20,8 @@ const start = async (ctx) => {
 					remove_keyboard: true,
 				},
 			});
-			console.log(ctx.message.chat.id);
 			await ctx.scene.enter("sceneWizard");
 	}
 };
 
-module.exports = { start };
+export { start };

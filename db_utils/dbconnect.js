@@ -1,8 +1,7 @@
-// const key =
-// 	"patlbO4LCHuvG39e5.9e7cc8bffb8761afec80e0c925a90fedbd682b89795fffd6cd1789acc893226a";
-require("dotenv").config();
-const key = process.env.AIRT_TOKEN;	
-const Airtable = require("airtable");
+import { config } from "dotenv";
+config();
+const key = process.env.AIRT_TOKEN;
+import Airtable from "airtable";
 
 Airtable.configure({
 	endpointUrl: "https://api.airtable.com",
@@ -13,24 +12,25 @@ const base = new Airtable({ key }).base("appzPQJSwnY2cv4zc");
 
 async function getFields(table) {
 	const pageRecords = [];
-try{
-	await base(table)
-		.select({
-			maxRecords: 50,
-			view: "bot_view",
-		})
-		.eachPage(function page(records, fetchNextPage) {
-			records.forEach(function (record) {
-				pageRecords.push(record.fields);
+	try {
+		await base(table)
+			.select({
+				maxRecords: 50,
+				view: "bot_view",
+			})
+			.eachPage(function page(records, fetchNextPage) {
+				records.forEach(function (record) {
+					let fields = record.fields;
+					fields.recId = record.id;
+					pageRecords.push(fields);
+				});
+				fetchNextPage();
 			});
-			fetchNextPage();
-		});
-	}
-	catch (e){
+	} catch (e) {
 		console.log(e);
 	}
 
 	return pageRecords;
 }
 
-module.exports = { getFields };
+export { getFields, base };

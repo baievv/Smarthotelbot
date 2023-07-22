@@ -1,8 +1,8 @@
-const { Telegraf, Composer, Scenes } = require("telegraf");
-const { isActualBookingByPhone } = require("../db_utils/db_utils");
-const { isTruePhone } = require("../utils/utils");
-const fs = require("fs");
-const { setupBot } = require("../bot");
+import { Composer, Scenes,session } from "telegraf";
+import { isActualBookingByPhone} from "../db_utils/db_utils.js";
+import { updateNewUserByPhone, updateUserPhotoByPhone } from "../db_utils/db_update.js";
+import { isTruePhone, userData, saveDocFromChat } from "../utils/utils.js";
+import { setupBot }  from "../bot.js";
 const webAppUrl = "https://smart-hotel.netlify.app/dashboard/1";
 
 const askPhone = new Composer();
@@ -18,49 +18,53 @@ getPhone.hears("start", async (ctx) => {
 	setupBot().launch();
 });
 getPhone.on("text", async (ctx) => {
-	const phoneNumber = ctx.message.text;
+	const msg = ctx.message;
+	const phoneNumber = msg.text;
+	
 	if (isTruePhone(phoneNumber).result) {
 		const { phone } = isTruePhone(phoneNumber);
+		ctx.session.phone=phone;
 		// Проверка на наличие актуальных бронировок по номеру телефона
 		const isFind = await isActualBookingByPhone(phone);
 		if (isFind) {
 			await ctx.reply("Спасибо! Ваша бронировка найдена😊");
-
-			// добавить данного пользователя в табличку Users
+			updateNewUserByPhone(phone, userData(msg), "nobody");
 			await ctx.reply(
 				"Для того, чтобы администратор смог проверить ваш документы - пришлите нам, пожалуйста, фото первой страницы загранпаспорта"
 			);
 			return ctx.scene.enter("checkPhoto");
 		} else {
-			ctx.reply(
+			await ctx.reply(
 				"К сожалению, актуальных бронировок на этот номер телефона не найдено😔"
 			);
-			ctx.reply("Возможно Вы прислали неправильный номер!");
+			await ctx.reply("Возможно Вы прислали неправильный номер!");
 		}
 		return ctx.scene.reenter("askPhone");
 	} else {
-		ctx.reply(
+		await ctx.reply(
 			"Номер, который Вы прислали, не соответствует международному формату🤷‍♀️"
 		);
 		return ctx.scene.reenter("askPhone");
 	}
-	return ctx.wizard.next();
 });
 
 const checkPhoto = new Scenes.BaseScene("checkPhoto");
 checkPhoto.hears("start", async (ctx) => {
 	setupBot().launch();
 });
+
 checkPhoto.on("document", async (ctx) => {
-	targetChatId = 909198449;
+	const targetChatId = 909198449;
+	// saveDocFromChat(ctx);
 	await ctx.telegram.sendMessage(
 		targetChatId,
 		`Гость ${ctx.message.chat.first_name} (${ctx.message.chat.username}) прислал документы для проверки`
 	);
+	updateUserPhotoByPhone(ctx);
+	console.log(ctx.message);
 	await ctx.forwardMessage(targetChatId, ctx.message.chat.id, ctx.message.message_id);
 	await ctx.reply("Спасибо! Ваши документы отправлены администратору на проверку");
 	await ctx.reply("Мы пришлем Вам уведомление, как только документы будут проверены!");
-	// ctx.scene.leave("checkPhoto");
 	const delaySeconds = 3;
 	setTimeout(async () => {
 		await ctx.reply("Хорошие новости - Ваши документы подтверждены администратором");
@@ -98,7 +102,6 @@ checkPhoto.on("document", async (ctx) => {
 });
 
 checkPhoto.on("message", async (ctx) => {
-	console.log(ctx.message);
 	if (typeof ctx.message.document === "undefined") {
 		await ctx.reply("Простите, но это не фото");
 		ctx.scene.enter("reAskPhoto");
@@ -121,4 +124,4 @@ reAskPhoto.enter(async (ctx) => {
 
 const firstTimeScene = new Scenes.WizardScene("sceneWizard", askPhone, getPhone);
 
-module.exports = { firstTimeScene, reAskPhoto, checkPhoto };
+export { firstTimeScene, reAskPhoto, checkPhoto };
