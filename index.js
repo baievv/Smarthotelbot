@@ -1,17 +1,26 @@
-// Записываем в файл index.js
 import { config } from "dotenv";
+import routes from "./routes/index.js";
 config();
-// const { Telegraf, Composer, Scenes, session, Markup } = require("telegraf");
 
 import express from "express";
 // const bodyParser = require("body-parser");
 import bodyParser from "body-parser";
-import {setupBot}  from "./bot.js";
+import { setupBot } from "./bot.js";
 
 const app = express();
 app.use(bodyParser.json());
 
-const init=async ()=> {
+app.use(function (req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Methods", "GET");
+	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, content-type");
+	res.setHeader("Access-Control-Allow-Credentials", true);
+	next();
+});
+
+routes(app);
+
+const init = async () => {
 	try {
 		console.log("start bot");
 		setupBot().launch();
@@ -24,11 +33,6 @@ app.listen(process.env.PORT || 8443, async () => {
 	console.log("app running on port-", process.env.PORT || 8443);
 	init();
 });
-
-
-
-
-
 
 // 	if (ctx?.message.web_app_data?.data) {
 // 		try {

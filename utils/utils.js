@@ -22,7 +22,6 @@ const userData = (msg) => {
 };
 
 const saveDocFromChat = async (ctx) => {
-	// console.log(ctx.message.document);
 	const document = ctx.message.document;
 	const file = await ctx.telegram.getFileLink(document.file_id);
 	console.log(file);
