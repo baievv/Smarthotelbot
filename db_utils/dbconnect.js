@@ -1,6 +1,7 @@
-const key =
-	"patlbO4LCHuvG39e5.9e7cc8bffb8761afec80e0c925a90fedbd682b89795fffd6cd1789acc893226a";
-const Airtable = require("airtable");
+import { config } from "dotenv";
+config();
+const key = process.env.AIRT_TOKEN;
+import Airtable from "airtable";
 
 Airtable.configure({
 	endpointUrl: "https://api.airtable.com",
@@ -9,29 +10,27 @@ Airtable.configure({
 
 const base = new Airtable({ key }).base("appzPQJSwnY2cv4zc");
 
-async function findByTgId() {
-	
-	base("Users")
-		.select({
-			maxRecords: 50,
-			view: "Grid view",
-		})
-		.eachPage(
-			function page(records, fetchNextPage) {
+async function getFields(table) {
+	const pageRecords = [];
+	try {
+		await base(table)
+			.select({
+				maxRecords: 50,
+				view: "bot_view",
+			})
+			.eachPage(function page(records, fetchNextPage) {
 				records.forEach(function (record) {
-					console.log("Record:", record.fields);
-					
+					let fields = record.fields;
+					fields.recId = record.id;
+					pageRecords.push(fields);
 				});
 				fetchNextPage();
-			},
-			function done(err) {
-				if (err) {
-					console.error(err);
-					return;
-				}
-			}
-		);
-
+			});
+	} catch (e) {
+		console.log(e);
 	}
 
-findByTgId();
+	return pageRecords;
+}
+
+export { getFields, base };
