@@ -5,16 +5,19 @@ const lockId = "9166406";
 const accessToken = "cfbfd3e45cb1b35077f41756b8a6f448";
 
 export default async function execCommand(apart, device, command) {
-	console.log("inside");
+	console.log("inside execCommand");
+  let result;
 	if (apart === "Batumi" && device === "lock") {
 		if (command === "open") {
 			let lockStatus = await requestLockStatus(clientId, accessToken, lockId);
 			console.log("Lock now is", lockStatus);
-			let result = await openLock(clientId, accessToken, lockId);
+			result = await openLock(clientId, accessToken, lockId);
+      console.log('Result of exec is -', result);
 		}
 		if (command === "close") {
 		}
 		if (command === "status") {
 		} else return "unknown command";
 	}
+  return result;
 }
