@@ -3,11 +3,12 @@ import routes from "./routes/index.js";
 config();
 
 import express from "express";
-// const bodyParser = require("body-parser");
 import bodyParser from "body-parser";
 import { setupBot } from "./bot.js";
+import execCommand from "./iot-connect/index.js";
 
 const app = express();
+
 app.use(bodyParser.json());
 
 app.use(function (req, res, next) {

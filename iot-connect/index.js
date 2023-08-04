@@ -1,23 +1,27 @@
 import { requestLockStatus, openLock, closeLock } from "./lock-server.js";
 
-const clientId = "329721a18c01487ebe8c4f6ed920c4db";
-const lockId = "9166406";
-const accessToken = "cfbfd3e45cb1b35077f41756b8a6f448";
-
 export default async function execCommand(apart, device, command) {
 	console.log("inside execCommand");
-  let result;
-	if (apart === "Batumi" && device === "lock") {
-		if (command === "open") {
-			let lockStatus = await requestLockStatus(clientId, accessToken, lockId);
-			console.log("Lock now is", lockStatus);
-			result = await openLock(clientId, accessToken, lockId);
-      console.log('Result of exec is -', result);
-		}
-		if (command === "close") {
-		}
-		if (command === "status") {
-		} else return "unknown command";
-	}
-  return result;
+	let result;
+	const lockStatus = await requestLockStatus();
+	console.log("Lock state now is -", lockStatus.state);
+	// if (apart === "batumi" && device === "lock" && lockStatus.state==0) {
+	if (lockStatus.state == 0 && command === "open") {
+		let res = await openLock();
+		console.log("Result of opening is -", res);
+		let lockState = await requestLockStatus();
+		console.log("Lock state now is", lockState.state);
+		if (lockState.state == 1) {
+			result = { status: "Lock was opened" };
+		} else result = { status: "Have some problems" };
+	} else if (lockStatus.state == 1 && command === "close") {
+		let res = await closeLock();
+		console.log("Result of close is -", res);
+		let lockState = await requestLockStatus();
+		console.log("Lock state now is", lockState.state);
+		if (lockState.state == 0) {
+			result = { status: "Lock was closed" };
+		} else result = { status: "Have some problems" };
+	} else result = { status: "Unknown command" };
+	return result;
 }
