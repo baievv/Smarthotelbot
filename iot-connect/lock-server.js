@@ -1,10 +1,10 @@
-const axios = require("axios");
+import axios from "axios";
 const date = Date.now();
 const clientId = "329721a18c01487ebe8c4f6ed920c4db";
 const lockId = "9166406";
 const accessToken = "cfbfd3e45cb1b35077f41756b8a6f448";
 
-async function requestLockStatus(date, clientId, accessToken) {
+export async function requestLockStatus(date, clientId, accessToken) {
 	try {
 		const response = await axios.get(
 			`https://euapi.ttlock.com/v3/lock/queryOpenState?clientId=${clientId}&accessToken=${accessToken}&lockId=9166406&date=${date}`
@@ -15,7 +15,8 @@ async function requestLockStatus(date, clientId, accessToken) {
 	}
 }
 
-async function getLockDetails(clientId, accessToken, lockId, date) {
+export async function getLockDetails(clientId, accessToken, lockId) {
+	
 	try {
 		const response = await axios.get(
 			`https://euapi.ttlock.com/v3/lock/detail?clientId=${clientId}&accessToken=${accessToken}&lockId=${lockId}&date=${date}`
@@ -26,7 +27,7 @@ async function getLockDetails(clientId, accessToken, lockId, date) {
 	}
 }
 
-async function openLock(clientId, accessToken, lockId, date) {
+export async function openLock(clientId, accessToken, lockId, date) {
 	const url = "https://euapi.ttlock.com/v3/lock/unlock";
 	const data = new URLSearchParams();
 
@@ -50,7 +51,7 @@ async function openLock(clientId, accessToken, lockId, date) {
 		});
 }
 
-async function closeLock(clientId, accessToken, lockId, date) {
+export async function closeLock(clientId, accessToken, lockId, date) {
 	const url = "https://euapi.ttlock.com/v3/lock/lock";
 	const data = new URLSearchParams();
 
@@ -83,4 +84,4 @@ async function closeLock(clientId, accessToken, lockId, date) {
 // openLock(clientId, accessToken, lockId, date);
 // closeLock(clientId, accessToken, lockId, date);
 
-module.exports = { requestLockStatus, openLock, closeLock };
+// module.exports = { requestLockStatus, openLock, closeLock };
