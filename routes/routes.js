@@ -1,5 +1,6 @@
 //routing main
 import execCommand from "../iot-connect/index.js";
+
 export default function (app) {
 	app.get("/dashboard/*/*/*", (req, res) => {
 		console.log("Try to use /dashboard/");
@@ -8,13 +9,8 @@ export default function (app) {
 		const command = req.params[2];
 
 		console.log("Aparts is ", aparts, " device is ", device, " command is ", command);
-
-		execCommand(aparts, device, command);
-
-		res.json({
-			path: "asdd",
-			result: true,
-			files: "dashboards",
-		});
+		let status = execCommand(aparts, device, command);
+		console.log('Status is -', status);
+		res.json(status);
 	});
 }
