@@ -32,6 +32,7 @@ const init = async () => {
 
 app.listen(process.env.PORT || 8443, async () => {
 	console.log("app running on port-", process.env.PORT || 8443);
+	
 	init();
 });
 
