@@ -5,7 +5,8 @@ config();
 import express from "express";
 import bodyParser from "body-parser";
 import { setupBot } from "./bot.js";
-import execCommand from "./iot-connect/index.js";
+import https from "https";
+import fs from "fs";
 
 const app = express();
 
@@ -30,9 +31,14 @@ const init = async () => {
 	}
 };
 
-app.listen(process.env.PORT || 8443, async () => {
+const httpsOptions = {
+	key: fs.readFileSync('./ssl/private.key'),
+	cert: fs.readFileSync("./ssl/certificate.crt"),
+};
+
+https.createServer(httpsOptions, app).listen(process.env.PORT || 8443, async () => {
 	console.log("app running on port-", process.env.PORT || 8443);
-	
+
 	init();
 });
 
