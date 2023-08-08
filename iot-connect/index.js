@@ -30,15 +30,20 @@ export default async function execCommand(apart, device, command) {
 		const res = await lockOpen();
 		console.log("Result of opening is -", res);
 		if (res.errcode === 0) {
-			result = { status: "opened" };
+			result = { status: "open" };
 		} else result = { status: "problems" };
 	};
 	if (status.state == 1 && command === "switch") {
 		sleep(500);
 		const res = await lockClose();
 		if (res.errcode === 0) {
-			result = { status: "closed" };
+			result = { status: "close" };
 		} else result = { status: "problems" };
+	};
+	if (command==='status'){
+		if (status===0){
+			result='closed';
+		}else result='open';
 	};
 	console.log('Result function is -',result);
  return result;

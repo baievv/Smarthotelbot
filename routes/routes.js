@@ -14,7 +14,8 @@ export default function (app) {
 		const command = req.params[2];
 
 		console.log("Aparts is ", aparts, " device is ", device, " command is ", command);
-		res.json(useCommand(aparts, device, command));
-		// res.json(status);
+		let response=useCommand(aparts,device,command);
+		console.log("Response is ", response);
+		res.json(response);
 	});
 }
