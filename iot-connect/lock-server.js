@@ -1,7 +1,7 @@
 import axios from "axios";
 const clientIdd = "329721a18c01487ebe8c4f6ed920c4db";
 const lockIdd = "9166406";
-const accessTokenn = "cfbfd3e45cb1b35077f41756b8a6f448";
+const accessTokenn = "ba197d2b1e53729b7bdb0233accebd3b";
 
 export async function requestLockStatus(
 	clientId = clientIdd,
