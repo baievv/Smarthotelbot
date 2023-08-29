@@ -1,6 +1,8 @@
 import fs from "fs";
 import got from "got";
 import { pipeline } from "stream/promises";
+import { bot } from "../bot.js";
+import { findTgIdFromBookingsByAparts } from "../db_utils/db_utils.js";
 
 const isTruePhone = (text) => {
 	
@@ -40,4 +42,31 @@ const saveDocFromChat = async (ctx) => {
 	}
 };
 
-export { isTruePhone, userData, saveDocFromChat };
+const saveDocFromAirtable= async(document)=>{
+	const file = document.file_id;
+	console.log('File - ',file);
+	const filePath = `./documents/${document.file_name}`;
+	// const fileStream = fs.createWriteStream(filePath);
+
+	const { href: url } = document;
+	console.log("url -", url);
+	console.log("filePath -", filePath);
+	// pipeline(got.stream(url), fs.createWriteStream(filePath));
+
+	try {
+		await pipeline(got.stream(url), fs.createWriteStream(filePath));
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+const testFunc=async (aparts,device,state)=>{
+	console.log("Aparts-", aparts, ", device -", device, ", state -", state);
+	let chatId = await findTgIdFromBookingsByAparts(aparts);
+	try {
+		bot.telegram.sendMessage(chatId, `${device} is ${state}`);
+	} catch (error) {
+		console.log(error);
+	}
+}
+export { isTruePhone, userData, saveDocFromChat,saveDocFromAirtable, testFunc };

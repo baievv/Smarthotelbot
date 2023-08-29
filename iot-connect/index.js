@@ -23,7 +23,7 @@ async function sleep(ms) {
 export default async function execCommand(apart, device, command) {
 	let result;
 	const status = await lockStatus();
-	console.log("Lock state now is -", status.state);
+	console.log("Lock state now is -", status);
 	// if (apart === "batumi" && device === "lock" && lockStatus.state==0) {
 	if (status.state == 0 && command === "switch") {
 		await sleep(500);
@@ -41,7 +41,7 @@ export default async function execCommand(apart, device, command) {
 		} else result = { status: "problems" };
 	};
 	if (command==='status'){
-		if (status===0){
+		if (status.state===0){
 			result='closed';
 		}else result='open';
 	};
