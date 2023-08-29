@@ -2,13 +2,18 @@ import { Composer, Scenes } from "telegraf";
 import {
 	addRecordForApprove,
 	getApartsAndRoomByTgId,
+	getBookingsRecordIdbyTgId,
 	getUserInfoByTgId,
 	isActualBookingByPhone,
 } from "../db_utils/db_utils.js";
-import { updateNewUserByPhone, updateUserPhotoByPhone } from "../db_utils/db_update.js";
+import { updateBookingCheckinTempByTgId, updateNewUserByPhone } from "../db_utils/db_update.js";
 import { isTruePhone, userData } from "../utils/utils.js";
-import { checkDocsBtn } from "../buttons/markup_buttons.js";
+import { checkDocsBtn } from "../buttons/admin_buttons.js";
 import { start } from "./commands.js";
+import {
+	userChooseTemperature,
+	userIsNeedTemperature,
+} from "../buttons/guest_buttons.js";
 
 const switchRole = new Scenes.BaseScene("switchRole");
 switchRole.enter(async (ctx) => {
@@ -66,23 +71,10 @@ getPhone.on("text", async (ctx) => {
 const checkPhoto = new Scenes.BaseScene("checkPhoto");
 checkPhoto.on("photo", async (ctx) => {
 	const targetChatId = 909198449;
-
-	await ctx.telegram.sendMessage(
-		targetChatId,
-		`Гость ${ctx.message.chat.first_name} (${ctx.message.chat.username}) прислал фото документов для проверки`
-	);
-
-	updateUserPhotoByPhone(ctx, "photo");
-	console.log(ctx.message);
-	await ctx.forwardMessage(targetChatId, ctx.message.chat.id, ctx.message.message_id);
-	docsChecked(ctx);
-	ctx.scene.leave("checkPhoto");
-});
-
-checkPhoto.on("document", async (ctx) => {
+	const document = ctx.message.photo.at(-1);
 	const adminChatId = 909198449;
-	const { href: url } = await ctx.telegram.getFileLink(ctx.message.document.file_id);
-	
+	const { href: url } = await ctx.telegram.getFileLink(document.file_id);
+
 	const user = await getUserInfoByTgId(ctx.message.chat.id);
 	const temp = await getApartsAndRoomByTgId(ctx.message.chat.id);
 	console.log("temp- ", temp);
@@ -91,7 +83,6 @@ checkPhoto.on("document", async (ctx) => {
 	user.BookingNumber = temp.book_number;
 	user.document = [{ url }];
 	addRecordForApprove(user);
-	// updateUserPhotoByPhone(ctx, "doc");
 
 	await ctx.telegram.sendMessage(
 		adminChatId,
@@ -108,9 +99,38 @@ checkPhoto.on("document", async (ctx) => {
 	);
 });
 
-checkPhoto.action('user-have-app-docs',(ctx)=>{
-	docsChecked(ctx);
-	ctx.scene.leave('checkPhoto');
+checkPhoto.on("document", async (ctx) => {
+	const adminChatId = 909198449;
+	const { href: url } = await ctx.telegram.getFileLink(ctx.message.document.file_id);
+
+	const user = await getUserInfoByTgId(ctx.message.chat.id);
+	const temp = await getApartsAndRoomByTgId(ctx.message.chat.id);
+	console.log("temp- ", temp);
+	user.aparts = temp.aparts;
+	user.roomNumber = temp.room;
+	user.BookingNumber = temp.book_number;
+	user.document = [{ url }];
+	addRecordForApprove(user);
+
+	await ctx.telegram.sendMessage(
+		adminChatId,
+		`Получены новые документы от гостя ${user.FullName}\n` +
+			`по бронированию #${user.BookingNumber}\n` +
+			`Апартаменты -${user.aparts}\n` +
+			`Номер комнаты - ${user.roomNumber}\n` +
+			`для проверки`,
+		checkDocsBtn
+	);
+
+	await ctx.reply(
+		"Документы отправлены на проверку. Пожалуйста, подождите ответа от администратора🙂"
+	);
+});
+
+checkPhoto.action("user-have-app-docs", (ctx) => {
+	// docsChecked(ctx);
+	ctx.scene.leave("checkPhoto");
+	ctx.scene.enter("requestCheckinTemperature");
 });
 
 checkPhoto.on("message", async (ctx) => {
@@ -135,8 +155,69 @@ reAskPhoto.enter(async (ctx) => {
 	ctx.scene.enter("checkPhoto");
 });
 
+const requestCheckinTemperature = new Scenes.BaseScene("requestCheckinTemperature");
+
+requestCheckinTemperature.enter(async (ctx) => {
+	console.log("CHatId - ",ctx.chat.id);
+	ctx.scene.session.recordId=await getBookingsRecordIdbyTgId(ctx.chat.id);
+	console.log("Booking number is ", ctx.scene.session.recordId);
+	await ctx.reply(
+		`Нам очень важен комфорт наших гостей!\n` +
+			`Поэтому мы предлагаем Вам выбрать желаемую температуру, которая будет в апартаментах на момент Вашего прибытия`,
+		userIsNeedTemperature
+	);
+});
+
+requestCheckinTemperature.action("user-need-checkin-ac", async (ctx) => {
+	await ctx.answerCbQuery("Oк, good choice👌");
+	await ctx.reply(
+		"Супер!Давайте выберем температуру, которая будет для Вас комфортна",
+		userChooseTemperature
+	);
+});
+
+requestCheckinTemperature.action("user-noneed-checkin-ac", async (ctx) => {
+	await ctx.answerCbQuery("OK, no problem");
+	docsChecked(ctx);
+	//!!!!!!ctx.scene.leave("requestCheckinTemperature");
+});
+
+requestCheckinTemperature.action("user-checkin-ac18", async (ctx) => {
+	await updateBookingCheckinTempByTgId(ctx.scene.session.recordId, 19);
+	await ctx.reply("Вы выбрали температуру 18-19°!");
+	await ctx.reply("Вы не любите жару?)))");
+	docsChecked(ctx);
+});
+
+requestCheckinTemperature.action("user-checkin-ac20", async (ctx) => {
+	await updateBookingCheckinTempByTgId(ctx.scene.session.recordId, 19);
+	await ctx.reply("Вы выбрали температуру 20-21°!");
+	await ctx.reply("Вы не любите жару?)))");
+	docsChecked(ctx);
+});
+
+requestCheckinTemperature.action("user-checkin-ac22", async (ctx) => {
+	await updateBookingCheckinTempByTgId(ctx.scene.session.recordId, 19);
+	await ctx.reply("Вы выбрали температуру 22-23°!");
+	await ctx.reply("Вы - любитель комфорта)))");
+	docsChecked(ctx);
+});
+requestCheckinTemperature.action("user-checkin-ac24", async (ctx) => {
+	await updateBookingCheckinTempByTgId(ctx.scene.session.recordId, 19);
+	await ctx.reply("Вы выбрали температуру 24-25°!");
+	await ctx.reply("Идеальный выбор)))");
+	docsChecked(ctx);
+});
+
+requestCheckinTemperature.action("user-checkin-ac26", async (ctx) => {
+	await updateBookingCheckinTempByTgId(ctx.scene.session.recordId, 19);
+	await ctx.reply("Вы выбрали температуру 26-27°!");
+	await ctx.reply("Любите потеплее?)))");
+	docsChecked(ctx);
+});
+
 const docsChecked = async (ctx) => {
-	const delaySeconds=1;
+	const delaySeconds = 1;
 	setTimeout(async () => {
 		await ctx.reply("Ваши апартаменты расположены по адресу --");
 		await ctx.sendLocation(41.64560982834371, 41.61851927863314);
@@ -172,4 +253,4 @@ const docsChecked = async (ctx) => {
 
 const firstTimeScene = new Scenes.WizardScene("sceneWizard", askPhone, getPhone);
 
-export { firstTimeScene, reAskPhoto, checkPhoto, switchRole };
+export { firstTimeScene, reAskPhoto, checkPhoto, switchRole, requestCheckinTemperature };

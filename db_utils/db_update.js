@@ -1,43 +1,8 @@
 import { getUserRecordIdbyPhone,getUserRecordIdbyTgId } from "./db_utils.js";
 import { base } from "./dbconnect.js";
 
-const updateUserPhotoByPhone = async (ctx, type) => {
-	const { phone } = ctx.session;
-	// console.log("User phone - ", phone);
-	const recordId = await getUserRecordIdbyPhone(phone);
-	// console.log("User rec id - ", recordId);
-	let document, photo;
-	// console.log("Type - ", type);
-	// console.log(ctx.message);
-	if (type === "doc") {
-		document = ctx.message.document;
-	}
-	if (type==='photo'){
-		document=ctx.message.photo.at(-1);
-		}
-
-	const { href: url } = await ctx.telegram.getFileLink(document.file_id);
-	// console.log("User photo link - ", url);
-	base("Users").update(
-		[
-			{
-				id: recordId,
-				fields: {
-					passport: [{ url }],
-				},
-			},
-		],
-		function (err) {
-			if (err) {
-				console.error(err);
-				return;
-			}
-		}
-	);
-};
 
 const updateUserPhotoByTgId = async (guest, type) => {
-	//  const guest= ctx.scene.session.MyArray;
 	const recordId = await getUserRecordIdbyTgId(guest.tg_id);
 	let document;
 	if (type === "doc") {
@@ -94,4 +59,56 @@ const updateNewUserByPhone = async (phone, userData, role) => {
 	);
 };
 
-export { updateNewUserByPhone, updateUserPhotoByPhone , updateUserPhotoByTgId};
+const updateBookingCheckinTempByTgId = async (recordId, temperature) => {
+	base("Bookings").update(
+		[
+			{
+				id: recordId,
+				fields: {
+					Checkin_temperature: temperature,
+				},
+			},
+		],
+		function (err) {
+			if (err) {
+				console.error(err);
+				return;
+			}
+		}
+	);
+};
+
+export { updateNewUserByPhone , updateUserPhotoByTgId,updateBookingCheckinTempByTgId};
+
+
+
+// const updateUserPhotoByPhone = async (ctx, type) => {
+// 	const { phone } = ctx.session;
+// 	const recordId = await getUserRecordIdbyPhone(phone);
+// 	let document;
+	
+// 	if (type === "doc") {
+// 		document = ctx.message.document;
+// 	}
+// 	if (type==='photo'){
+// 		document=ctx.message.photo.at(-1);
+// 		}
+
+// 	const { href: url } = await ctx.telegram.getFileLink(document.file_id);
+// 	base("Users").update(
+// 		[
+// 			{
+// 				id: recordId,
+// 				fields: {
+// 					passport: [{ url }],
+// 				},
+// 			},
+// 		],
+// 		function (err) {
+// 			if (err) {
+// 				console.error(err);
+// 				return;
+// 			}
+// 		}
+// 	);
+// };

@@ -1,7 +1,12 @@
 import { Scenes, session, Composer, Markup } from "telegraf";
 import { start } from "./commands.js";
 import { getAllApprovesToArray, getRecordCount } from "../db_utils/db_utils.js";
-import { againCheckDocsBtn, approveDocsBtn, startCheckDocsBtn, userHaveApprovedDocs } from "../buttons/markup_buttons.js";
+import {
+	againCheckDocsBtn,
+	approveDocsBtn,
+	startCheckDocsBtn,
+} from "../buttons/admin_buttons.js";
+import { userHaveApprovedDocs } from "../buttons/guest_buttons.js";
 import { updateUserPhotoByTgId } from "../db_utils/db_update.js";
 import { deleteRecordByRecId } from "../db_utils/db_delete.js";
 const adminApproveDocs = new Scenes.BaseScene("adminApproveDocs");
@@ -30,16 +35,20 @@ adminApproveDocs.action("start-check-docs", async (ctx) => {
 });
 
 adminApproveDocs.action("approve-guest-docs", async (ctx) => {
-	let guest=ctx.scene.session.myArray[0];
+	let guest = ctx.scene.session.myArray[0];
 	// console.log("Guest is ",guest);
 	await ctx.reply(`Вы одобрили документы гостя ${guest.pib}`);
-	await ctx.telegram.sendMessage(guest.tg_id,"Поздравляем!Администратор одобрил Ваши документы",userHaveApprovedDocs )
+	await ctx.telegram.sendMessage(
+		guest.tg_id,
+		"Поздравляем!Администратор одобрил Ваши документы",
+		userHaveApprovedDocs
+	);
 	await updateUserPhotoByTgId(guest, "doc");
-	await deleteRecordByRecId("ApproveDocs",guest);
-	if (ctx.scene.session.myArray.length>=2){
-		ctx.reply(`У вас еще есть непроверенные документы`,againCheckDocsBtn);
+	await deleteRecordByRecId("ApproveDocs", guest);
+	if (ctx.scene.session.myArray.length >= 2) {
+		ctx.reply(`У вас еще есть непроверенные документы`, againCheckDocsBtn);
 	} else {
-		ctx.reply("На данный момент запросов на проверку документов нет")
+		ctx.reply("На данный момент запросов на проверку документов нет");
 	}
 });
 

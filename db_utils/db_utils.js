@@ -16,27 +16,27 @@ const findRoleByTgId = async (id) => {
 const getApartsAndRoomByTgId = async (id) => {
 	const records = await getFields("Bookings");
 	console.log("inside getAparts");
-	let rec={};
+	let rec = {};
 	for (const item of records) {
 		if (item.tg_id == id) {
-			console.log('Item -',item);
+			console.log("Item -", item);
 			rec.aparts = item.Aparts;
-			rec.room=item.Room;
-			rec.book_number=item.BookingNumber;
+			rec.room = item.Room;
+			rec.book_number = item.BookingNumber;
 			break; // Досрочный выход из цикла при условии
 		}
 	}
 	return rec;
 };
 
-const getAllApprovesToArray= async()=>{
+const getAllApprovesToArray = async () => {
 	const records = await getFields("ApproveDocs");
 	let rec = [];
 	for (const item of records) {
-			rec.push(item)
-		}
+		rec.push(item);
+	}
 	return rec;
-}
+};
 
 const getUserInfoByTgId = async (tgId) => {
 	const records = await getFields("Users");
@@ -66,7 +66,7 @@ const addRecordForApprove = async (record) => {
 				fields: {
 					pib: record.FullName,
 					tg_id: record.tg_id,
-					BookingNumber:record.BookingNumber,
+					BookingNumber: record.BookingNumber,
 					Aparts: record.aparts,
 					room_number: record.roomNumber,
 					document: record.document,
@@ -107,6 +107,19 @@ const getUserRecordIdbyTgId = async (tg_id) => {
 	}
 	return id;
 };
+const getBookingsRecordIdbyTgId = async (tg_id) => {
+	const records = await getFields("Bookings");
+	let id = 0;
+	console.log("List Bookings");
+	for (const item of records) {
+		console.log(item);
+		if (item.tgId == tg_id) {
+			id = item.recId;
+			break; // Досрочный выход из цикла при условии
+		}
+	}
+	return id;
+};
 
 const isActualBookingByPhone = async (phone) => {
 	let result = false;
@@ -114,13 +127,24 @@ const isActualBookingByPhone = async (phone) => {
 	const records = await getFields("Bookings");
 	for (const item of records) {
 		let guestDate = Date.parse(item.CheckIn);
-		// console.log(`Guest phone -${item.Phone}, phone - ${phone}`);
-		// console.log(`Guest Date -${guestDate}, now - ${date}`);
 		if (item.Phone == phone && guestDate > date) {
 			result = true;
 		}
 	}
 	return result;
+};
+
+const findTgIdFromBookingsByAparts = async (aparts) => {
+	const records = await getFields("Bookings");
+	const apart = aparts === "batumi" && "Batumi Smart";
+	let id = 0;
+	for (const item of records) {
+		if (item.isActual === "Yes" && item.Aparts === apart) {
+			id = Number(item.tgId);
+			break; // Досрочный выход из цикла при условии
+		}
+	}
+	return id;
 };
 
 export {
@@ -132,5 +156,7 @@ export {
 	getRecordCount,
 	addRecordForApprove,
 	getApartsAndRoomByTgId,
-	getAllApprovesToArray
+	getAllApprovesToArray,
+	getBookingsRecordIdbyTgId,
+	findTgIdFromBookingsByAparts,
 };

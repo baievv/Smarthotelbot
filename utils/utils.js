@@ -1,6 +1,8 @@
 import fs from "fs";
 import got from "got";
 import { pipeline } from "stream/promises";
+import { bot } from "../bot.js";
+import { findTgIdFromBookingsByAparts } from "../db_utils/db_utils.js";
 
 const isTruePhone = (text) => {
 	
@@ -58,4 +60,13 @@ const saveDocFromAirtable= async(document)=>{
 	}
 }
 
-export { isTruePhone, userData, saveDocFromChat,saveDocFromAirtable };
+const testFunc=async (aparts,device,state)=>{
+	console.log("Aparts-", aparts, ", device -", device, ", state -", state);
+	let chatId = await findTgIdFromBookingsByAparts(aparts);
+	try {
+		bot.telegram.sendMessage(chatId, `${device} is ${state}`);
+	} catch (error) {
+		console.log(error);
+	}
+}
+export { isTruePhone, userData, saveDocFromChat,saveDocFromAirtable, testFunc };

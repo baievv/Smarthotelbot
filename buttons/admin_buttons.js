@@ -29,12 +29,6 @@ const againCheckDocsBtn = Markup.inlineKeyboard([
 	.oneTime()
 	.resize();
 
-	const userHaveApprovedDocs = Markup.inlineKeyboard([
-		Markup.button.callback("Продолжить", "user-have-app-docs"),
-	])
-		.oneTime()
-		.resize();
-
 const approveDocsBtn = Markup.inlineKeyboard([
 	Markup.button.callback("✅Одобрить", "approve-guest-docs"),
 	Markup.button.callback("⛔️Отклонить", "disapprove-guest-docs"),
@@ -49,5 +43,4 @@ export {
 	startCheckDocsBtn,
 	approveDocsBtn,
 	againCheckDocsBtn,
-	userHaveApprovedDocs
 };
