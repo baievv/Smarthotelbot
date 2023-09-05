@@ -6,7 +6,10 @@ import {
 	getUserInfoByTgId,
 	isActualBookingByPhone,
 } from "../db_utils/db_utils.js";
-import { updateBookingCheckinTempByTgId, updateNewUserByPhone } from "../db_utils/db_update.js";
+import {
+	updateBookingCheckinTempByTgId,
+	updateNewUserByPhone,
+} from "../db_utils/db_update.js";
 import { isTruePhone, userData } from "../utils/utils.js";
 import { checkDocsBtn } from "../buttons/admin_buttons.js";
 import { start } from "./commands.js";
@@ -158,8 +161,8 @@ reAskPhoto.enter(async (ctx) => {
 const requestCheckinTemperature = new Scenes.BaseScene("requestCheckinTemperature");
 
 requestCheckinTemperature.enter(async (ctx) => {
-	console.log("CHatId - ",ctx.chat.id);
-	ctx.scene.session.recordId=await getBookingsRecordIdbyTgId(ctx.chat.id);
+	console.log("CHatId - ", ctx.chat.id);
+	ctx.scene.session.recordId = await getBookingsRecordIdbyTgId(ctx.chat.id);
 	console.log("Booking number is ", ctx.scene.session.recordId);
 	await ctx.reply(
 		`Нам очень важен комфорт наших гостей!\n` +
@@ -238,7 +241,7 @@ const docsChecked = async (ctx) => {
 							{
 								text: "Управление апартаментами",
 								web_app: {
-									url: `https://smart-hotel.netlify.app/dashboard/1`,
+									url: `https://yarociytech.com/dashboard/1`,
 								},
 							},
 							{ text: "Связаться с администратором" },
