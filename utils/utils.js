@@ -5,7 +5,6 @@ import { bot } from "../bot.js";
 import { findTgIdFromBookingsByAparts } from "../db_utils/db_utils.js";
 
 const isTruePhone = (text) => {
-	
 	const phoneNumberPattern = /^\+(?:[0-9] ?){6,14}[0-9]$/;
 	const cleanedText = text.replace(/[\s-]+/g, "");
 	const isPhoneNumber = phoneNumberPattern.test(cleanedText);
@@ -42,9 +41,9 @@ const saveDocFromChat = async (ctx) => {
 	}
 };
 
-const saveDocFromAirtable= async(document)=>{
+const saveDocFromAirtable = async (document) => {
 	const file = document.file_id;
-	console.log('File - ',file);
+	console.log("File - ", file);
 	const filePath = `./documents/${document.file_name}`;
 	// const fileStream = fs.createWriteStream(filePath);
 
@@ -58,9 +57,9 @@ const saveDocFromAirtable= async(document)=>{
 	} catch (e) {
 		console.log(e);
 	}
-}
+};
 
-const testFunc=async (aparts,device,state)=>{
+const testFunc = async (aparts, device, state) => {
 	console.log("Aparts-", aparts, ", device -", device, ", state -", state);
 	let chatId = await findTgIdFromBookingsByAparts(aparts);
 	try {
@@ -68,5 +67,25 @@ const testFunc=async (aparts,device,state)=>{
 	} catch (error) {
 		console.log(error);
 	}
+};
+
+async function readDataFromFile(filePath) {
+	 try {
+			const data = await fs.readFile(filePath, "utf8");
+			const result = JSON.parse(data);
+			console.log("Func Data is", result);
+			return result;
+		} catch (err) {
+			console.error(err);
+			throw err; // Пересылаем ошибку, чтобы обработать её в вызывающем коде
+		}
 }
-export { isTruePhone, userData, saveDocFromChat,saveDocFromAirtable, testFunc };
+
+export {
+	readDataFromFile,
+	isTruePhone,
+	userData,
+	saveDocFromChat,
+	saveDocFromAirtable,
+	testFunc,
+};

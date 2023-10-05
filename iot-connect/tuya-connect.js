@@ -15,7 +15,7 @@ const httpClient = axios.create({
 	timeout: 5 * 1e3,
 });
 
-async function main() {
+async function getSensorData() {
 	// 1. Login signature, request highway to get login token
 	const tokenHeaders = await getTokenSign();
 	const options = {
@@ -52,6 +52,7 @@ async function main() {
 	// console.log("Business data obtained successfully: ", JSON.stringify(data));
 	console.log("Business data obtained successfully: ", data);
 	console.log("Result from sensor -", data.result[0].status);
+	return data.result[0].status;
 }
 
 // Token signature, just pass it as headers
@@ -124,4 +125,6 @@ async function encryptStr(str, secret) {
 		.toUpperCase();
 }
 
-main();
+// main();
+
+export {getSensorData};

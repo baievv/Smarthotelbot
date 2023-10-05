@@ -20,7 +20,7 @@ async function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export default async function execCommand(apart, device, command) {
+export default async function execIOTCommand(apart, device, command) {
 	let result;
 	const status = await lockStatus();
 	console.log("Lock state now is -", status);
@@ -48,3 +48,5 @@ export default async function execCommand(apart, device, command) {
 	console.log('Result function is -',result);
  return result;
 }
+
+

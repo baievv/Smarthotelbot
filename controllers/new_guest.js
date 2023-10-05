@@ -179,7 +179,7 @@ requestCheckinTemperature.action("user-need-checkin-ac", async (ctx) => {
 	);
 });
 
-requestCheckinTemperature.action("user-noneed-checkin-ac", async (ctx) => {
+requestCheckinTemperature.action("user-no-need-checkin-ac", async (ctx) => {
 	await ctx.answerCbQuery("OK, no problem");
 	docsChecked(ctx);
 	//!!!!!!ctx.scene.leave("requestCheckinTemperature");

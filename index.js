@@ -24,15 +24,15 @@ routes(app);
 
 const init = async () => {
 	try {
-		console.log("start bot");
 		setupBot().launch();
+		console.log("start bot");
 	} catch (error) {
 		console.log("Error bot start", error);
 	}
 };
 
 const httpsOptions = {
-	key: fs.readFileSync('./ssl/private.key'),
+	key: fs.readFileSync("./ssl/private.key"),
 	cert: fs.readFileSync("./ssl/certificate.crt"),
 };
 
@@ -53,29 +53,3 @@ https.createServer(httpsOptions, app).listen(process.env.PORT || 8443, async () 
 // 		}
 // 	}
 // });
-
-// const init = async () => {
-// 	// const res = await getFields("Users");
-// 	const res = await findRoleByTgId(6019423987);
-// 	console.log("Role is", res);
-// };
-
-// try {
-// 	await ctx.reply("Welcome to Yarocka Smart Apartments", {
-// 		reply_markup: {
-// 			keyboard: [
-// 				[
-// 					{
-// 						text: "Manage your aparts",
-// 						web_app: { url: webAppUrl },
-// 					},
-// 				],
-// 			],
-// 			resize_keyboard: true,
-// 			one_time_keyboard: true,
-// 		},
-// 	});
-// 	await ctx.reply(`Your role is ${userRole}`);
-// } catch (e) {
-// 	console.log(e);
-// }
