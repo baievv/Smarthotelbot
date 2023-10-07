@@ -27,7 +27,7 @@ const setupBot = () => {
 	bot.use((ctx, next) => {
 		return next();
 	});
-	bot.launch();
+	// bot.launch();
 	bot.use(session());
 	bot.use(stage.middleware());
 	addBotActions();

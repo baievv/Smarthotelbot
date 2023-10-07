@@ -24,7 +24,9 @@ routes(app);
 
 const init = async () => {
 	try {
-		setupBot().launch();
+		setupBot().launch({
+			dropPendingUpdates: true,
+		});
 		console.log("start bot");
 	} catch (error) {
 		console.log("Error bot start", error);

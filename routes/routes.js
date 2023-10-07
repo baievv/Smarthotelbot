@@ -27,6 +27,8 @@ export default function (app) {
 		const device = req.params[1];
 		const command = req.params[2];
 	  console.log("Aparts is ", aparts, " device is ", device, " command is ", command);
+		console.log("device-", device);
+		console.log("command-", command);
 
 		try {
 			let response = await useCommand(aparts, device, command);
